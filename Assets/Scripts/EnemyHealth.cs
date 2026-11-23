@@ -21,8 +21,26 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    private void Die()
+
+
+    void Die()
     {
-        Destroy(gameObject);
+    WaveManager waveManager = FindFirstObjectByType<WaveManager>();
+
+    if (waveManager != null)
+    {
+        waveManager.EnemyKilled();
     }
+
+    ScoreManager scoreManager = FindFirstObjectByType<ScoreManager>();
+
+    if (scoreManager != null)
+    {
+        scoreManager.AddScore(10);
+    }
+
+    Destroy(gameObject);
+    }
+
+
 }

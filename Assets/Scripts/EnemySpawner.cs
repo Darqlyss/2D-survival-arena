@@ -4,32 +4,26 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
-    public Transform[] spawnPoints;
+    public GameObject tankEnemyPrefab;
 
-    public float spawnInterval = 3f;
+    public Transform[] spawnPoints;
     public float minSpawnDistance = 3f;
 
     private Transform player;
-    private float nextSpawnTime;
 
-    void Start()
+    void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        nextSpawnTime = Time.time + spawnInterval;
-    }
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
-    void Update()
-    {
-        if (Time.time >= nextSpawnTime)
+        if (playerObject != null)
         {
-            SpawnEnemy();
-            nextSpawnTime = Time.time + spawnInterval;
+            player = playerObject.transform;
         }
     }
 
-    public void SpawnEnemy()
+    public void SpawnEnemy(int wave)
     {
-        if (spawnPoints.Length == 0)
+        if (player == null || spawnPoints.Length == 0)
             return;
 
         int startIndex = Random.Range(0, spawnPoints.Length);
@@ -39,14 +33,31 @@ public class EnemySpawner : MonoBehaviour
             int index = (startIndex + i) % spawnPoints.Length;
             Transform spawnPoint = spawnPoints[index];
 
+            if (spawnPoint == null)
+                continue;
+
             float distance = Vector2.Distance(
-                spawnPoint.position, player.position);
+                spawnPoint.position,
+                player.position
+            );
 
             if (distance >= minSpawnDistance)
             {
-                Instantiate(enemyPrefab,
-                    spawnPoint.position,
-                    Quaternion.identity);
+                GameObject enemyToSpawn = enemyPrefab;
+
+                if (wave >= 2 && Random.Range(0, 4) == 0)
+                {
+                    enemyToSpawn = tankEnemyPrefab;
+                }
+
+                if (enemyToSpawn != null)
+                {
+                    Instantiate(
+                        enemyToSpawn,
+                        spawnPoint.position,
+                        Quaternion.identity
+                    );
+                }
 
                 return;
             }

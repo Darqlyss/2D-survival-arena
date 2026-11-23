@@ -1,26 +1,30 @@
 
 using UnityEngine;
+using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
     public int maxHealth = 100;
+    public int currentHealth;
 
-    private int currentHealth;
-    private bool isDead;
+    public TextMeshProUGUI healthText;
 
-    void Awake()
+    void Start()
     {
         currentHealth = maxHealth;
+        UpdateHealthText();
     }
 
     public void TakeDamage(int damage)
     {
-        if (isDead)
-            return;
+        currentHealth -= damage;
 
-        currentHealth = Mathf.Max(0, currentHealth - damage);
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+        }
 
-        Debug.Log("Životy hráče: " + currentHealth);
+        UpdateHealthText();
 
         if (currentHealth <= 0)
         {
@@ -28,12 +32,18 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    private void Die()
+    void UpdateHealthText()
     {
-        isDead = true;
+        healthText.text = "HEALTH: " + currentHealth + "/" + maxHealth;
+    }
 
-        Debug.Log("Game Over");
+    void Die()
+    {
+    GameManager gameManager = FindFirstObjectByType<GameManager>();
 
-        Time.timeScale = 0f;
+    if (gameManager != null)
+    {
+        gameManager.GameOver();
+    }
     }
 }
